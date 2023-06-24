@@ -3,20 +3,24 @@ pub fn is_valid(code: &str) -> bool {
     let spaceless = code.replace(' ', "");
 
     spaceless.len() > 1
-        && spaceless.chars().all(|c| c.is_digit(10))
+        && spaceless.chars().all(|c| c.is_ascii_digit())
         && spaceless
             .chars()
             .rev()
+            .map(|c| {
+                c.to_digit(10)
+                    .expect("Only pass here if all characters are ascii digits")
+            })
             .enumerate()
-            .map(|(i, c)| {
+            .map(|(i, d)| {
+                let mut x = d;
                 if i % 2 == 1 {
-                    match c.to_digit(10).unwrap() * 2 {
-                        n if n < 10 => n,
-                        n => n - 9,
+                    x *= 2;
+                    if x >= 10 {
+                        x -= 9;
                     }
-                } else {
-                    c.to_digit(10).unwrap()
                 }
+                x
             })
             .sum::<u32>()
             % 10
