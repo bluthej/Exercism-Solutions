@@ -6,16 +6,14 @@ pub struct Roman {
 
 impl Display for Roman {
     fn fmt(&self, f: &mut Formatter<'_>) -> Result {
-        let mut num = self.num;
-        let mut res = Vec::new();
-        let mut level = 0;
-        while num > 0 {
-            let digit = num.rem_euclid(10);
-            res.push(roman_format(digit, level));
-            num = (num - digit) / 10;
-            level += 1;
-        }
-        f.write_str(&res.into_iter().rev().collect::<String>())
+        let output: String = (0..4)
+            .rev()
+            .filter_map(|level| {
+                let q = self.num / 10_u32.pow(level);
+                (q > 0).then_some(roman_format(q % 10, level))
+            })
+            .collect();
+        f.write_str(&output)
     }
 }
 
